@@ -18,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
 import com.komori.wu.mina.event.FirstEvent;
+import com.komori.wu.mina.mina.listener.HeartBeatListener;
 
 /**
  * Created by KomoriWu
@@ -61,7 +62,7 @@ public class ConnectionManager {
         //编码过滤
         mConnection.getFilterChain().addLast("codec", new ProtocolCodecFilter(
                 new TextLineCodecFactory(Charset.forName("UTF-8"), LineDelimiter.WINDOWS.
-                        getValue(),LineDelimiter.WINDOWS.getValue())));
+                        getValue(), LineDelimiter.WINDOWS.getValue())));
 
         //事物处理
         mConnection.setHandler(new MinaClientHandler(mContext.get()));
@@ -77,6 +78,8 @@ public class ConnectionManager {
             //一直连接，直至成功
             future.awaitUninterruptibly();// 等待连接创建成功
             mSession = future.getSession();// 获取会话
+            //为MINA客户端添加监听器，当Session会话关闭的时候，进行自动重连
+            mConnection.addListener(new HeartBeatListener(mConnection));
             Log.d(TAG, "connection");
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -111,13 +114,26 @@ public class ConnectionManager {
         @Override
         public void sessionCreated(IoSession session) throws Exception {
 
-
         }
 
         @Override
-        public void sessionOpened(IoSession session) throws Exception {
+        public void sessionOpened(final IoSession session) throws Exception {
             //将我们的session 保存到我们sessionManager 中，从而可以发送消息到服务器
-            session.write("hello");
+//            session.write("hello");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < 20; i++) {
+                        try {
+                            Thread.sleep(3000);
+                            session.write("heart");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+
         }
 
         @Override
@@ -128,12 +144,7 @@ public class ConnectionManager {
         @Override
         public void messageReceived(IoSession session, Object message) throws Exception {
             //1,EventBus 来进行事件通知
-            //2,广播
             if (mContext != null) {
-//                Intent intent = new Intent(BROADCAST_ACTION);
-//                intent.putExtra(MESSAGE, message.toString());
-//                //使用局部广播，保证安全性
-//                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                 Log.d(TAG, "messageReceived:" + message.toString());
                 EventBus.getDefault().post(new FirstEvent(message.toString()));
             }
@@ -145,11 +156,12 @@ public class ConnectionManager {
         }
     }
 
-    public void sendMess(String mess){
+    public void sendMess(String mess) {
         try {
             new MinaClientHandler(mContext.get()).sessionOpened(mSession);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

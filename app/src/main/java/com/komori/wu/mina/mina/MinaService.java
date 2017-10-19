@@ -3,12 +3,20 @@ package com.komori.wu.mina.mina;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraAccessException;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.komori.wu.mina.MainActivity;
+import com.komori.wu.mina.event.FirstEvent;
+import com.komori.wu.mina.mina.listener.HeartBeatListener;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 /**
  * Created by KomoriWu
@@ -16,13 +24,12 @@ import com.komori.wu.mina.MainActivity;
  */
 
 public class MinaService extends Service {
-public static final String TAG=MinaService.class.getSimpleName();
+    public static final String TAG = MinaService.class.getSimpleName();
     private ConnectionThread thread;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        //全局context 避免内存泄漏，不多说
         thread = new ConnectionThread("mina", getApplicationContext());
         thread.start();
     }
@@ -57,7 +64,7 @@ public static final String TAG=MinaService.class.getSimpleName();
                     .setPort(MainActivity.PORT)
                     .setReadBuilder(10240)
                     .setConnectionTimeout(10000).builder();
-            mManager=new ConnectionManager(config);
+            mManager = new ConnectionManager(config);
         }
 
         //run 开始连接我们的服务器
@@ -67,7 +74,7 @@ public static final String TAG=MinaService.class.getSimpleName();
             //死循环
             for (; ; ) {
                 isConnection = mManager.connection();
-                Log.d(TAG,"isConnection:"+isConnection);
+                Log.d(TAG, "isConnection:" + isConnection);
                 if (isConnection) {
                     break;
                 }

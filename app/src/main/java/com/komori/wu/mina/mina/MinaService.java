@@ -3,20 +3,12 @@ package com.komori.wu.mina.mina;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.camera2.CameraAccessException;
-import android.os.Build;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.komori.wu.mina.MainActivity;
-import com.komori.wu.mina.event.FirstEvent;
-import com.komori.wu.mina.mina.listener.HeartBeatListener;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 /**
  * Created by KomoriWu

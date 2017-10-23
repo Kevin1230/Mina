@@ -13,12 +13,12 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import java.net.InetSocketAddress;
 
-public class HeartBeatListener implements IoServiceListener {
-    public static final String TAG = HeartBeatListener.class.getSimpleName();
+public class AutoReConnListener implements IoServiceListener {
+    public static final String TAG = AutoReConnListener.class.getSimpleName();
     public static final int TIMES = 10;
     public NioSocketConnector connector;
 
-    public HeartBeatListener(NioSocketConnector connector) {
+    public AutoReConnListener(NioSocketConnector connector) {
         this.connector = connector;
     }
 

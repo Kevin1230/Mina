@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int PORT = 22001;
     private TextView tv;
     CameraManager manager;
+    private int count;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                tv.setText(tv.getText() + "\n" + event.getMsg());
+                tv.setText(tv.getText() + "\n" + event.getMsg()+count++);
                 if (event.getMsg().contains("on")) {
                     Toast.makeText(MainActivity.this, "设备开灯", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                }else {
+                }else if (event.getMsg().contains("off")){
                     Toast.makeText(MainActivity.this, "设备关灯", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         try {

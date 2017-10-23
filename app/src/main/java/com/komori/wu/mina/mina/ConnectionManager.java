@@ -5,10 +5,13 @@ import android.util.Log;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.LineDelimiter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.keepalive.KeepAliveFilter;
+import org.apache.mina.filter.keepalive.KeepAliveMessageFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.greenrobot.eventbus.EventBus;
@@ -18,7 +21,8 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
 import com.komori.wu.mina.event.FirstEvent;
-import com.komori.wu.mina.mina.listener.HeartBeatListener;
+import com.komori.wu.mina.mina.listener.AutoReConnListener;
+import com.komori.wu.mina.mina.listener.KeepAliveFactoryImpl;
 
 /**
  * Created by KomoriWu
@@ -28,15 +32,13 @@ import com.komori.wu.mina.mina.listener.HeartBeatListener;
 
 public class ConnectionManager {
     public static final String TAG = ConnectionManager.class.getSimpleName();
-
+    private static final int CONN_TIMEOUT = 30 * 1000;
+    private static final int IDLE_TIMEOUT = 30 * 1000;
+    private static final int HEART_BEAT_RATE = 30 * 1000;
     private ConnectionConfig mConfig;
-
     private WeakReference<Context> mContext; //避免内存泄漏
-
     private NioSocketConnector mConnection;
-
     private IoSession mSession;
-
     private InetSocketAddress mAddress;
 
     public ConnectionManager(ConnectionConfig config) {
@@ -48,17 +50,12 @@ public class ConnectionManager {
 
     //通过构建者模式来进行初始化
     private void init() {
-
         mAddress = new InetSocketAddress(mConfig.getIp(), mConfig.getPort());
-
         mConnection = new NioSocketConnector();
-
         //设置读数据大小
         mConnection.getSessionConfig().setReadBufferSize(mConfig.getReadBufferSize());
-
         //添加日志过滤
-        mConnection.getFilterChain().addLast("Logging", new LoggingFilter());
-
+        mConnection.getFilterChain().addLast("Logger", new LoggingFilter());
         //编码过滤
         mConnection.getFilterChain().addLast("codec", new ProtocolCodecFilter(
                 new TextLineCodecFactory(Charset.forName("UTF-8"), LineDelimiter.WINDOWS.
@@ -66,9 +63,18 @@ public class ConnectionManager {
 
         //事物处理
         mConnection.setHandler(new MinaClientHandler(mContext.get()));
-
         mConnection.setDefaultRemoteAddress(mAddress);// 设置默认访问地址
-        mConnection.setConnectTimeoutMillis(30000); //设置连接超时
+        mConnection.setConnectTimeoutMillis(CONN_TIMEOUT); //设置连接超时
+        mConnection.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, IDLE_TIMEOUT);
+
+//        心跳机制
+//        KeepAliveMessageFactory heartBeatFactory = new KeepAliveFactoryImpl();
+//        KeepAliveFilter heartBeat = new KeepAliveFilter(heartBeatFactory, IdleStatus.READER_IDLE);
+//        //是否回发
+//        heartBeat.setForwardEvent(true);
+//        //发送频率
+//        heartBeat.setRequestInterval(HEART_BEAT_RATE);
+//        mConnection.getFilterChain().addLast("heartbeat", heartBeat);
     }
 
     //连接方法（外部调用）
@@ -79,7 +85,7 @@ public class ConnectionManager {
             future.awaitUninterruptibly();// 等待连接创建成功
             mSession = future.getSession();// 获取会话
             //为MINA客户端添加监听器，当Session会话关闭的时候，进行自动重连
-            mConnection.addListener(new HeartBeatListener(mConnection));
+            mConnection.addListener(new AutoReConnListener(mConnection));
             Log.d(TAG, "connection");
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -119,14 +125,15 @@ public class ConnectionManager {
         @Override
         public void sessionOpened(final IoSession session) throws Exception {
             //将我们的session 保存到我们sessionManager 中，从而可以发送消息到服务器
-//            session.write("hello");
+//            session.write("heart");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i = 0; i < 20; i++) {
+                    for (; ; ) {
                         try {
-                            Thread.sleep(3000);
+                            Thread.sleep(HEART_BEAT_RATE);
                             session.write("heart");
+                            Log.d(TAG, "session.write heart");
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -154,6 +161,7 @@ public class ConnectionManager {
         public void messageSent(IoSession session, Object message) throws Exception {
             super.messageSent(session, message);
         }
+
     }
 
     public void sendMess(String mess) {

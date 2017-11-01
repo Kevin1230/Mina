@@ -29,7 +29,6 @@ import com.komori.wu.mina.mina.listener.KeepAliveFactoryImpl;
  * on 2017-10-19.
  */
 
-
 public class ConnectionManager {
     public static final String TAG = ConnectionManager.class.getSimpleName();
     private static final int CONN_TIMEOUT = 30 * 1000;
@@ -125,7 +124,7 @@ public class ConnectionManager {
         @Override
         public void sessionOpened(final IoSession session) throws Exception {
             //将我们的session 保存到我们sessionManager 中，从而可以发送消息到服务器
-//            session.write("heart");
+            session.write("account:456:endpointId:endpoint-002");
             new Thread(new Runnable() {
                 @Override
                 public void run() {

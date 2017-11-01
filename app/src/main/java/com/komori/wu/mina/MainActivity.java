@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 tv.setText(tv.getText() + "\n" + event.getMsg()+count++);
-                if (event.getMsg().contains("on")) {
+                if (event.getMsg().contains("On")) {
                     Toast.makeText(MainActivity.this, "设备开灯", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         try {
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                }else if (event.getMsg().contains("off")){
+                }else if (event.getMsg().contains("Off")){
                     Toast.makeText(MainActivity.this, "设备关灯", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         try {

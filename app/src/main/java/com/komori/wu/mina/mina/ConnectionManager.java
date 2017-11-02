@@ -124,7 +124,7 @@ public class ConnectionManager {
         @Override
         public void sessionOpened(final IoSession session) throws Exception {
             //将我们的session 保存到我们sessionManager 中，从而可以发送消息到服务器
-            session.write("account:456:endpointId:endpoint-002");
+            session.write("account:456:endpointId:endpoint-001");
             new Thread(new Runnable() {
                 @Override
                 public void run() {

@@ -1,0 +1,53 @@
+{
+    "context": {
+        "properties": [
+            {
+                "namespace": "Alexa.BrightnessController",
+                "name": "brightness",
+                "value": 85,
+                "timeOfSample": "2018-01-19T14:19:30.45Z",
+                "uncertaintyInMilliseconds": 200
+            },
+            {
+                "namespace": "Alexa.EndpointHealth",
+                "name": "connectivity",
+                "value": {
+                    "value": "OK"
+                },
+                "timeOfSample": "2018-01-19T14:19:30.45Z",
+                "uncertaintyInMilliseconds": 200
+            }
+        ]
+    },
+    "event": {
+        "header": {
+            "namespace": "Alexa",
+            "name": "ChangeReport",
+            "payloadVersion": "3",
+            "messageId": "5f8csc6e-01e4-4cc9-8b79-65f8bc0fd111"
+        },
+        "endpoint": {
+           "scope":{
+                "type":"BearerToken",
+                "token":"Atza|IwEBILnels_GNn3KYVDpT9ZCdaj3hYg20rMymGBhIOkmmjKpbrKPCjbc2XHiLwdAOWCbNO6LpNevFEtP1fqqljA67D3U97Qq_3Xy5R1g0HIUJZsPmRykDzl7oW-dopvhJ2AdUTtUlCUKDNaqLSb-0g89LIZis5NN8csIcpQZS35-73-_j9bYoHYIIfDf7Bt9ZBEX7af6QZUymJEzSm5_CO_ix1n1IHH8XmVSnd6F2FdT7WKrC20gxBjDJeXJ7VX9-QzGgczUhQXwG_yvgAluXFQzIftzApSCvp1hGTr-EFXE3vMHyBKTB1RIpys8AYlRMxzh14H9HbUGPPxy3Lb7XJxAfh2t"
+            },
+            "endpointId": "endpoint-001"
+        },
+        "payload": {
+            "change": {
+                "cause": {
+                    "type": "PHYSICAL_INTERACTION"
+                },
+                "properties": [
+                    {
+                        "namespace": "Alexa.PowerController",
+                        "name": "powerState",
+                        "value": "ON",
+                        "timeOfSample": "2018-01-19T14:19:30.45Z",
+                        "uncertaintyInMilliseconds": 200
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -8,12 +8,17 @@
     tools:context="com.komori.wu.mina.MainActivity">
     <Button
         android:id="@+id/btn1"
-        android:text="第一步"
+        android:text="第一步通过code请求token"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/btn"
-        android:text="第二步"
+        android:id="@+id/btn2"
+        android:text="第二步通过token请求播报"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn3"
+        android:text="刷新token"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <ScrollView

@@ -30,4 +30,5 @@ dependencies {
     compile files('libs/slf4j-api-1.7.21.jar')
     compile files('libs/mina-core-2.0.16.jar')
     compile 'org.greenrobot:eventbus:3.0.0'
+    implementation files('libs/gson-2.5.jar')
 }
